@@ -13,7 +13,12 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 'upcoming',
       },
     },
-    { tableName: 'bookings', paranoid: false }
+    { 
+  tableName: 'bookings', 
+  paranoid: false,
+  underscored: true,  
+  timestamps: true    
+}
   );
 
   Booking.associate = (models) => {

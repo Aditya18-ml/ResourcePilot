@@ -25,14 +25,14 @@ export default function DashboardPage() {
   }));
 
   const kpis = [
-    { label: 'Total Assets', value: data?.totalAssets || 0, color: 'text-brand-600' },
-    { label: 'Active Assignments', value: data?.activeAssignments || 0, color: 'text-blue-600' },
-    { label: 'Pending Requests', value: data?.pendingRequests || 0, color: 'text-amber-600' },
-    {
-      label: 'Total Value (₹)',
-      value: Number(data?.totalValue || 0).toLocaleString('en-IN'),
-      color: 'text-emerald-600',
-    },
+    { label: 'Total Assets', value: data?.totalAssets || 0, color: 'text-slate-900 bg-slate-50' },
+    { label: 'Available Assets', value: data?.assetsAvailable || 0, color: 'text-indigo-600 bg-indigo-50/50' },
+    { label: 'Allocated Assets', value: data?.assetsAllocated || 0, color: 'text-sky-600 bg-sky-50/50' },
+    { label: 'Active Bookings', value: data?.activeBookings || 0, color: 'text-emerald-600 bg-emerald-50/50' },
+    { label: 'Repairs (Today)', value: data?.maintenanceToday || 0, color: 'text-amber-600 bg-amber-50/50' },
+    { label: 'Pending Transfers', value: data?.pendingTransfers || 0, color: 'text-purple-600 bg-purple-50/50' },
+    { label: 'Upcoming Returns', value: data?.upcomingReturns || 0, color: 'text-blue-600 bg-blue-50/50' },
+    { label: 'Overdue Returns ⚠️', value: data?.overdueReturns || 0, color: 'text-red-700 bg-red-50 border border-red-200' },
   ];
 
   return (
@@ -44,9 +44,9 @@ export default function DashboardPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {kpis.map((kpi) => (
-          <div key={kpi.label} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">{kpi.label}</p>
-            <p className={`mt-2 text-3xl font-bold ${kpi.color}`}>{kpi.value}</p>
+          <div key={kpi.label} className={`rounded-xl border border-slate-200 p-5 shadow-sm ${kpi.color}`}>
+            <p className="text-sm font-medium opacity-80">{kpi.label}</p>
+            <p className="mt-2 text-3xl font-bold">{kpi.value}</p>
           </div>
         ))}
       </div>

@@ -49,14 +49,47 @@ exports.createVendor = asyncHandler(async (req, res) => {
 });
 
 exports.dashboard = asyncHandler(async (req, res) => {
+  const { Op } = require('sequelize');
+  const { Asset, Assignment, AssignmentRequest, Booking, Maintenance, Notification } = require('../models');
+
   const assetService = require('../services/asset.service');
   const stats = await assetService.getAssetStats();
 
-  const pendingRequests = await require('../models').AssignmentRequest.count({
+  const assetsAvailable = await Asset.count({ where: { status: 'in_stock' } });
+  const assetsAllocated = await Asset.count({ where: { status: 'assigned' } });
+
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const maintenanceToday = await Maintenance.count({
+    where: { createdAt: { [Op.gte]: todayStart } },
+  });
+
+  const activeBookings = await Booking.count({ where: { status: 'upcoming' } });
+
+  const pendingTransfers = await AssignmentRequest.count({
+    where: { status: 'submitted' },
+    include: [{ model: Asset, as: 'asset', where: { status: 'assigned' } }],
+  });
+
+  const upcomingReturns = await Assignment.count({
+    where: {
+      status: 'active',
+      expectedReturnDate: { [Op.gt]: new Date() },
+    },
+  });
+
+  const overdueReturns = await Assignment.count({
+    where: {
+      status: 'active',
+      expectedReturnDate: { [Op.lt]: new Date() },
+    },
+  });
+
+  const pendingRequests = await AssignmentRequest.count({
     where: { status: 'submitted' },
   });
 
-  const activeAssignments = await require('../models').Assignment.count({
+  const activeAssignments = await Assignment.count({
     where: { status: 'active' },
   });
 
@@ -66,6 +99,13 @@ exports.dashboard = asyncHandler(async (req, res) => {
 
   sendSuccess(res, {
     ...stats,
+    assetsAvailable,
+    assetsAllocated,
+    maintenanceToday,
+    activeBookings,
+    pendingTransfers,
+    upcomingReturns,
+    overdueReturns,
     pendingRequests,
     activeAssignments,
     unreadNotifications,
